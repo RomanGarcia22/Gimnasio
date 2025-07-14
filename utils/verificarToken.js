@@ -22,7 +22,7 @@ async function obtenerIdMiembro(idUsuario){
 const verificarToken = (rolesPermitidos =[]) => {
   return async (req, res, next) =>{
     const autHeader = req.headers.authorization;
-    if (authHeader) return req.status(401).json({message:'Token requerido'});
+    if (!authHeader) return res.status(401).json({message:'Token requerido'});
     const token = autHeader.split(' ')[1];
     try{
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
