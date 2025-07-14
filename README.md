@@ -7,7 +7,7 @@ El proyecto cuenta con:
 -Actualización de clientes
 -Login a la aplicación 
 
-Estas son las funciones que de momento al día 14 de Julio del 2025 estan implementadas,🛠
+Estas son las funciones que de momento al día 14 de Julio del 2025 estan implementadas.
 Este proyecto ya fue desarrollado previamente de forma funcional, pero actualmente se está reconstruyendo desde cero para mejorar su estructura, limpieza de código y optimización general. 
 
 Este proyecto debera de contener además de lo anteriormente hecho las siguientes funciones:
