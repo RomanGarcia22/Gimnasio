@@ -56,7 +56,6 @@ exports.ActivarCliente = async (req, res) => {
 
 exports.registrarMaquina = async (req, res) => {
   const {nombre, musculo, llegada, imagen} = req.body;
-  const {id} = req.usuario;
 
   if (!nombre || !descripcion || !tipo || !estado) {
     return res.status(400).json({message: 'Todos los campos son obligatorios'});
