@@ -1,5 +1,4 @@
-const express = require('express');
-const QRCode = require('qrcode');
+const bcrypt = require('bcrypt');
 const {pool} = require ('../config/db');
 const generarHash = require('../utils/hash');
 const Cliente = require('../models/cliente');
@@ -106,7 +105,7 @@ exports.registrarEmpleado = async (req,res) =>{
     const conn = await pool.getConnection();
 
     try{
-        const {nombre, apellidoPaterno, apellidoMaterno, telefono, contrasenia, rol} = req.body();
+        const {nombre, apellidoPaterno, apellidoMaterno, telefono, contrasenia, rol} = req.body;
 
         if(!nombre || !apellidoPaterno || !apellidoMaterno || !contrasenia || !rol){
             return res.status(400).json({message: 'Faltan datos obligatorios'});
@@ -151,3 +150,43 @@ exports.registrarEmpleado = async (req,res) =>{
     }
 };
 
+exports.ModificarContrasena = async (req, res) => {
+  const {contrasenaActual, nuevaContrasena} = req.body;
+  const {id} = req.usuario;
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [usuario] = await conn.query(
+      'SELECT contrasenia FROM tbUsuario WHERE id_UsuarioPK = ?',
+      [id]
+    );
+
+    if (usuario.length === 0) {
+      return res.status(404).json({message: 'Usuario no encontrado'});
+    }
+
+    // Comparar hash de la contraseña actual
+    const esValida = await bcrypt.compare(contrasenaActual, usuario[0].contrasenia);
+    if (!esValida) {
+      return res.status(400).json({message: 'La contraseña actual es incorrecta'});
+    }
+
+    const nuevaHash = await generarHash(nuevaContrasena);
+
+    await conn.query(
+      'UPDATE tbUsuario SET contrasenia = ? WHERE id_UsuarioPK = ?',
+      [nuevaHash, id]
+    );
+
+    await conn.commit();
+    res.json({message: 'Contraseña actualizada correctamente'});
+  } catch (error) {
+    await conn.rollback();
+    console.error('Error al modificar contraseña', error);
+    res.status(500).json({message: 'Error en el servidor'});
+  } finally {
+    conn.release();
+  }
+};

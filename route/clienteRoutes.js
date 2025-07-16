@@ -7,4 +7,6 @@ const { verificarToken } = require('../utils/verificarToken');
 
 router.put('/ActualuzarMiembro',verificarToken(['miembro']), cliente.actualizarCliente);
 
+
+
 module.exports = router;

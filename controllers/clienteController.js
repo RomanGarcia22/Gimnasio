@@ -2,7 +2,7 @@ const {pool} = require ('../config/db');
 const Cliente = require('../models/cliente');
 
 exports.actualizarCliente = async (req, res) => {
-  const { correo, telefono, nombre, apellidoPaterno, apellidoMaterno, activo, rolNuevo, fotoPerfil} = req.body;
+  const { correo, telefono, nombre, apellidoPaterno, apellidoMaterno, activo, fotoPerfil} = req.body;
   const {id, rol} = req.usuario;
 
   const conn = await pool.getConnection();
@@ -34,3 +34,4 @@ exports.actualizarCliente = async (req, res) => {
     conn.release();
   }
 };
+
