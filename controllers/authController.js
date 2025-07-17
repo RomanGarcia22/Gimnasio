@@ -53,7 +53,7 @@ exports.registrarCliente = async (req,res) =>{
   
   try
   {
-    const {correo, telefono, contrasenia, nombre, apellidoPaterno, apellidoMaterno,fotoPerfil}= req.body;
+    const {correo, telefono, contrasenia, nombre, apellidoPaterno, apellidoMaterno,fotoPerfil,nickname}= req.body;
     
     await conn.beginTransaction();
 
@@ -65,6 +65,15 @@ exports.registrarCliente = async (req,res) =>{
         await conn.rollback();
         return res.status(400).json({message: 'El correo o teléfono ya esta registrado'});
     }
+    const [existNickname] = await conn.query(
+        'SELECT id_MiembroPK FROM tbMiembro WHERE nickname = ?',
+        [nickname]
+      );
+      
+    if (existNickname.length > 0) {
+        await conn.rollback();
+        return res.status(400).json({message: 'El nickname ya esta en uso'});
+      }
 
     const hashedPassword = await generarHash(contrasenia);
     const [usuarioResult] = await conn.query(
@@ -75,8 +84,8 @@ exports.registrarCliente = async (req,res) =>{
     const qrTexto = `MIEMBRO:${idUsuario}`;
 
     const[miembroResult] = await conn.query(
-        'INSERT INTO tbMiembro (nombre, apellidoPaterno, apellidoMaterno, codigoQR, fotoPerfil, puntos, protectores, activo, id_usuarioFK) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [nombre, apellidoPaterno,apellidoMaterno,qrTexto,fotoPerfil||null,0,0,1,idUsuario]
+        'INSERT INTO tbMiembro (nombre, apellidoPaterno, apellidoMaterno, codigoQR, fotoPerfil,nickname, puntos, protectores, activo, id_usuarioFK) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [nombre, apellidoPaterno,apellidoMaterno,qrTexto,fotoPerfil||null,nickname,0,0,1,idUsuario]
     );
 
     const idMiembro = miembroResult.insertId;
